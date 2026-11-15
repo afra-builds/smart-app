@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Repair & Reuse Platform — FYP Demo</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f172a; --navy-light: #1e293b; --teal: #14b8a6; --teal-dark: #0d9488;
+  --teal-light: #ccfbf1; --grey-50: #f8fafc; --grey-100: #f1f5f9; --grey-200: #e2e8f0;
+  --grey-400: #94a3b8; --grey-600: #475569; --amber: #f59e0b; --green: #16a34a;
+  --red: #dc2626; --blue: #2563eb;
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md: 0 4px 14px rgba(15,23,42,0.08);
+  --shadow-lg: 0 10px 30px rgba(15,23,42,0.12);
+  --radius: 14px; --radius-sm: 9px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',-apple-system,'Segoe UI',sans-serif; background:var(--grey-50); color:var(--navy-light); line-height:1.6; font-size:15px; }
+a { text-decoration:none; color:inherit; }
+h1,h2,h3,h4,h5 { font-weight:700; color:var(--navy); line-height:1.25; }
+
+/* NAVBAR */
+.navbar-custom { background:var(--navy); padding:.85rem 0; position:sticky; top:0; z-index:1030; box-shadow:var(--shadow-md); }
+.navbar-custom .navbar-brand { color:#fff; font-weight:800; font-size:1.3rem; display:flex; align-items:center; gap:.5rem; }
+.navbar-custom .navbar-brand i { color:var(--teal); font-size:1.5rem; }
+.brand-badge { background:var(--teal); color:var(--navy); font-size:.65rem; padding:2px 6px; border-radius:5px; font-weight:700; margin-left:.35rem; }
+.navbar-custom .nav-link { color:#cbd5e1 !important; font-size:.92rem; font-weight:500; padding:.5rem .9rem !important; border-radius:var(--radius-sm); cursor:pointer; transition:all .2s; }
+.navbar-custom .nav-link:hover, .navbar-custom .nav-link.active { color:#fff !important; background:rgba(20,184,166,.15); }
+.navbar-custom .btn-login { color:#fff; border:1.5px solid rgba(255,255,255,.3); background:transparent; padding:.45rem 1.1rem; border-radius:var(--radius-sm); font-weight:600; font-size:.9rem; }
+.navbar-custom .btn-login:hover { background:rgba(255,255,255,.1); }
+.navbar-custom .btn-signup { background:var(--teal); color:var(--navy); padding:.45rem 1.1rem; border-radius:var(--radius-sm); font-weight:700; font-size:.9rem; border:none; }
+.navbar-toggler { border:1px solid rgba(255,255,255,.3); }
+.navbar-toggler-icon { filter:invert(1); }
+
+/* SCREENS */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* HERO */
+.hero { background:linear-gradient(135deg,var(--navy) 0%,#1e3a8a 55%,#0f766e 100%); color:#fff; padding:5rem 0 4rem; position:relative; overflow:hidden; }
+.hero::after { content:"🔧"; position:absolute; right:-30px; bottom:-50px; font-size:22rem; opacity:.05; pointer-events:none; }
+.hero h1 { color:#fff; font-size:3rem; margin-bottom:1.2rem; }
+.hero h1 .accent { color:var(--teal); }
+.hero p { color:#cbd5e1; font-size:1.1rem; max-width:560px; margin-bottom:2rem; }
+.btn-hero-primary { background:var(--teal); color:var(--navy); padding:.85rem 1.8rem; border-radius:var(--radius-sm); font-weight:700; border:none; transition:all .25s; }
+.btn-hero-primary:hover { background:var(--teal-dark); color:#fff; transform:translateY(-2px); }
+.btn-hero-secondary { background:transparent; color:#fff; padding:.85rem 1.8rem; border-radius:var(--radius-sm); font-weight:600; border:1.5px solid rgba(255,255,255,.4); }
+.btn-hero-secondary:hover { background:rgba(255,255,255,.1); border-color:#fff; color:#fff; }
+.hero-stats { display:flex; gap:2.5rem; margin-top:2.5rem; flex-wrap:wrap; }
+.hero-stats .stat h3 { color:var(--teal); font-size:1.8rem; margin-bottom:.1rem; }
+.hero-stats .stat span { color:#94a3b8; font-size:.85rem; }
+
+/* SECTIONS */
+.section { padding:4rem 0; }
+.section-title { text-align:center; margin-bottom:.6rem; }
+.section-heading-line { width:60px; height:4px; background:var(--teal); border-radius:4px; margin:.8rem auto 2rem; }
+
+/* CARDS */
+.card-modern { background:#fff; border-radius:var(--radius); border:1px solid var(--grey-200); box-shadow:var(--shadow-sm); transition:transform .25s,box-shadow .25s; height:100%; }
+.card-modern:hover { transform:translateY(-5px); box-shadow:var(--shadow-lg); border-color:var(--teal-light); }
+.category-card { text-align:center; padding:1.8rem 1rem; cursor:pointer; }
+.cat-icon { width:64px; height:64px; border-radius:16px; background:var(--teal-light); color:var(--teal-dark); display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 1rem; transition:all .25s; }
+.category-card:hover .cat-icon { background:var(--teal); color:#fff; transform:scale(1.08) rotate(-4deg); }
+.step-card { text-align:center; padding:2rem 1.4rem; }
+.step-num { width:52px; height:52px; border-radius:50%; background:var(--navy); color:var(--teal); font-weight:800; font-size:1.3rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.2rem; border:3px solid var(--teal); }
+.feature-item { display:flex; gap:1rem; padding:1.2rem 0; }
+.feat-icon { width:48px; height:48px; flex-shrink:0; border-radius:12px; background:var(--teal-light); color:var(--teal-dark); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+
+/* TECH CARD */
+.tech-card { padding:1.4rem; }
+.tech-avatar { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--teal),var(--teal-dark)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.2rem; flex-shrink:0; }
+.stars { color:var(--amber); font-size:.85rem; }
+.tag { background:var(--teal-light); color:var(--teal-dark); font-size:.72rem; font-weight:600; padding:.25rem .65rem; border-radius:6px; display:inline-block; }
+
+/* BUTTONS */
+.btn-teal { background:var(--teal); color:#fff; border:none; padding:.6rem 1.3rem; border-radius:var(--radius-sm); font-weight:600; font-size:.9rem; transition:all .2s; }
+.btn-teal:hover { background:var(--teal-dark); color:#fff; }
+.btn-navy { background:var(--navy); color:#fff; border:none; padding:.6rem 1.3rem; border-radius:var(--radius-sm); font-weight:600; font-size:.9rem; }
+.btn-navy:hover { background:var(--navy-light); color:#fff; }
+.btn-outline-teal { background:transparent; color:var(--teal-dark); border:1.5px solid var(--teal); padding:.55rem 1.2rem; border-radius:var(--radius-sm); font-weight:600; font-size:.9rem; }
+.btn-outline-teal:hover { background:var(--teal); color:#fff; }
+.btn-sm-custom { padding:.4rem .9rem; font-size:.82rem; }
+
+/* FOOTER */
+.footer { background:var(--navy); color:#cbd5e1; padding:3.5rem 0 1.5rem; margin-top:4rem; }
+.footer h5 { color:#fff; font-size:1rem; margin-bottom:1rem; }
+.footer a { color:#94a3b8; font-size:.88rem; display:block; padding:.25rem 0; }
+.footer a:hover { color:var(--teal); }
+.footer-brand { font-size:1.3rem; font-weight:800; color:#fff; margin-bottom:1rem; }
+.footer-brand i { color:var(--teal); }
+.footer-bottom { border-top:1px solid rgba(255,255,255,.1); padding-top:1.5rem; margin-top:2rem; font-size:.82rem; color:#64748b; }
+
+/* FORMS */
+.form-control, .form-select { border:1.5px solid var(--grey-200); border-radius:var(--radius-sm); padding:.7rem .9rem; font-size:.92rem; background:var(--grey-50); }
+.form-control:focus, .form-select:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(20,184,166,.15); background:#fff; }
+.form-label { font-weight:600; font-size:.85rem; color:var(--navy-light); margin-bottom:.4rem; }
+
+/* STATUS BADGES */
+.status-badge { display:inline-block; padding:.35rem .8rem; border-radius:20px; font-size:.72rem; font-weight:700; text-transform:uppercase; }
+.status-requested { background:#fef3c7; color:#92400e; }
+.status-accepted { background:#dbeafe; color:#1e40af; }
+.status-repair { background:#fce7f3; color:#9d174d; }
+.status-completed { background:#dcfce7; color:#166534; }
+.status-rejected { background:#fee2e2; color:#991b1b; }
+
+/* TIMELINE */
+.timeline { display:flex; align-items:center; margin-top:1.4rem; flex-wrap:wrap; }
+.tl-step { display:flex; align-items:center; gap:.4rem; font-size:.78rem; font-weight:600; }
+.tl-step .dot { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; color:#fff; }
+.tl-step.done .dot { background:var(--green); } .tl-step.done { color:var(--green); }
+.tl-step.current .dot { background:var(--blue); } .tl-step.current { color:var(--blue); }
+.tl-step.todo .dot { background:#cbd5e1; } .tl-step.todo { color:var(--grey-400); }
+.tl-line { flex:1; height:3px; min-width:24px; background:#e2e8f0; margin:0 .3rem; }
+.tl-line.done { background:var(--green); }
+
+/* AI BOX */
+.ai-box { background:linear-gradient(135deg,#f0f9ff,#e0f2fe); border:1.5px dashed #38bdf8; border-radius:var(--radius); padding:1.3rem; }
+.ai-box h5 { color:#0369a1; font-size:1rem; margin-bottom:.6rem; }
+.ai-box p { font-size:.88rem; color:#0c4a6e; margin-bottom:.4rem; }
+
+/* DASHBOARD */
+.dash-hero { background:linear-gradient(135deg,var(--navy),#0f766e); color:#fff; border-radius:var(--radius); padding:2rem; margin-bottom:2rem; }
+.dash-hero h1 { color:#fff; font-size:1.8rem; margin-bottom:.4rem; }
+.dash-hero p { color:#cbd5e1; margin-bottom:1rem; }
+.quick-action { text-align:center; padding:1.5rem 1rem; cursor:pointer; display:block; }
+.qa-icon { width:56px; height:56px; border-radius:14px; background:var(--teal-light); color:var(--teal-dark); display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin:0 auto .8rem; transition:all .25s; }
+.quick-action:hover .qa-icon { background:var(--teal); color:#fff; transform:scale(1.08); }
+.stat-card { padding:1.3rem; }
+.stat-icon { width:44px; height:44px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; margin-bottom:.8rem; }
+.stat-card h3 { font-size:1.7rem; margin-bottom:.1rem; }
+.activity-item { display:flex; gap:.9rem; padding:.9rem 0; border-bottom:1px solid var(--grey-100); }
+.activity-item:last-child { border-bottom:none; }
+.act-icon { width:38px; height:38px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:.9rem; }
+
+/* AUTH */
+.auth-wrap { min-height:calc(100vh - 70px); display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--navy),#0f766e); padding:2rem 1rem; }
+.auth-card { background:#fff; border-radius:20px; padding:2.5rem 2rem; width:100%; max-width:440px; box-shadow:0 25px 60px rgba(0,0,0,.3); }
+.auth-logo { text-align:center; font-size:1.5rem; font-weight:800; color:var(--navy); margin-bottom:.3rem; }
+.auth-logo i { color:var(--teal); }
+.auth-sub { text-align:center; color:var(--grey-400); font-size:.88rem; margin-bottom:1.8rem; }
+.role-select { display:flex; gap:.7rem; margin-bottom:1.4rem; }
+.role-select .role-option { flex:1; }
+.role-select input { display:none; }
+.role-select label { display:block; text-align:center; padding:.85rem; border:1.5px solid var(--grey-200); border-radius:var(--radius-sm); cursor:pointer; font-size:.85rem; font-weight:600; color:var(--grey-600); }
+.role-select input:checked + label { border-color:var(--teal); background:var(--teal-light); color:var(--teal-dark); }
+.auth-tabs { display:flex; background:var(--grey-100); border-radius:var(--radius-sm); padding:4px; margin-bottom:1.5rem; }
+.auth-tabs button { flex:1; border:none; background:transparent; padding:.6rem; border-radius:7px; font-size:.88rem; font-weight:600; color:var(--grey-600); cursor:pointer; }
+.auth-tabs button.active { background:#fff; color:var(--navy); box-shadow:var(--shadow-sm); }
+
+/* REUSE */
+.reuse-card { overflow:hidden; }
+.reuse-img { height:150px; background:linear-gradient(135deg,#c7d2fe,#a5b4fc); display:flex; align-items:center; justify-content:center; font-size:3rem; color:#fff; }
+.reuse-body { padding:1.1rem 1.2rem; }
+
+/* PAGE HEADER */
+.page-header { background:linear-gradient(135deg,var(--navy),#1e3a8a); color:#fff; padding:3rem 0 2.5rem; margin-bottom:2.5rem; }
+.page-header h1 { color:#fff; font-size:2rem; margin-bottom:.4rem; }
+.page-header p { color:#cbd5e1; margin:0; }
+
+/* TOAST */
+.toast-custom { position:fixed; bottom:1.5rem; right:1.5rem; background:var(--green); color:#fff; padding:.9rem 1.4rem; border-radius:var(--radius-sm); font-size:.9rem; font-weight:600; box-shadow:0 10px 30px rgba(0,0,0,.25); transform:translateY(100px); opacity:0; transition:all .3s; z-index:9999; }
+.toast-custom.show { transform:translateY(0); opacity:1; }
+.toast-custom.error { background:var(--red); } .toast-custom.info { background:var(--blue); }
+
+/* RESPONSIVE */
+@media (max-width:992px) { .hero h1 { font-size:2.2rem; } .hero { padding:3.5rem 0; } }
+@media (max-width:768px) { .hero h1 { font-size:1.9rem; } .hero-stats { gap:1.5rem; } .section { padding:2.5rem 0; } .tl-step span:not(.dot){display:none;} }
+@media (max-width:576px) { .hero h1 { font-size:1.6rem; } .auth-card { padding:1.8rem 1.4rem; } }
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:2px solid var(--teal); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+    <a class="navbar-brand" href="#" onclick="go('home'); return false;"><i class="fa-solid fa-screwdriver-wrench"></i> Smart Repair <span class="brand-badge">FYP</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+        <li class="nav-item"><a class="nav-link" data-nav="home" onclick="go('home')">Home</a></li>
+        <li class="nav-item"><a class="nav-link" data-nav="report" onclick="go('report')">Report Problem</a></li>
+        <li class="nav-item"><a class="nav-link" data-nav="find" onclick="go('find')">Find Technician</a></li>
+        <li class="nav-item"><a class="nav-link" data-nav="tracking" onclick="go('tracking')">My Requests</a></li>
+        <li class="nav-item"><a class="nav-link" data-nav="reuse" onclick="go('reuse')">Reuse & Share</a></li>
+        <li class="nav-item"><a class="nav-link" data-nav="techdash" onclick="go('techdash')">Technician</a></li>
+        <li class="nav-item ms-lg-2" id="authButtons">
+          <a class="btn-login" onclick="go('auth')">Login</a>
+        </li>
+        <li class="nav-item ms-lg-1" id="userBadge" style="display:none;">
+          <a class="btn-signup" onclick="go('dashboard')"><i class="fa-solid fa-user-circle me-1"></i><span id="navUserName">User</span></a>
+        </li>
+        <li class="nav-item ms-lg-1" id="logoutBtn" style="display:none;">
+          <a class="btn-login" onclick="logout()">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== HOME SCREEN ===== -->
+<div id="screen-home" class="screen active">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h1>Repair Smarter.<br>Reuse <span class="accent">Better</span>.</h1>
+          <p>Connect with trusted repair technicians, get AI-assisted problem guidance, track your repairs, and give reusable appliances a second life — all in one platform.</p>
+          <div class="d-flex gap-3 flex-wrap">
+            <button class="btn btn-hero-primary" onclick="go('report')"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Report a Problem</button>
+            <button class="btn btn-hero-secondary" onclick="go('find')"><i class="fa-solid fa-user-gear me-2"></i>Find a Technician</button>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><h3>120+</h3><span>Verified technicians</span></div>
+            <div class="stat"><h3>2,400+</h3><span>Repairs completed</span></div>
+            <div class="stat"><h3>980+</h3><span>Items reused</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Popular Repair Categories</h2>
+        <p class="text-muted">Get expert help for common household and electronic items.</p>
+        <div class="section-heading-line"></div>
+      </div>
+      <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-2"><div class="card-modern category-card" onclick="go('report')"><div class="cat-icon"><i class="fa-solid fa-mobile-screen"></i></div><h5>Mobile</h5><small class="text-muted">Screen, battery</small></div></div>
+        <div class="col-6 col-md-4 col-lg-2"><div class="card-modern category-card" onclick="go('report')"><div class="cat-icon"><i class="fa-solid fa-laptop"></i></div><h5>Laptop</h5><small class="text-muted">Cooling, display</small></div></div>
+        <div class="col-6 col-md-4 col-lg-2"><div class="card-modern category-card" onclick="go('report')"><div class="cat-icon"><i class="fa-solid fa-snowflake"></i></div><h5>AC</h5><small class="text-muted">Cooling, gas</small></div></div>
+        <div class="col-6 col-md-4 col-lg-2"><div class="card-modern category-card" onclick="go('report')"><div class="cat-icon"><i class="fa-solid fa-box"></i></div><h5>Refrigerator</h5><small class="text-muted">Cooling, thermostat</small></div></div>
+        <div class="col-6 col-md-4 col-lg-2"><div class="card-modern category-card" onclick="go('report')"><div class="cat-icon"><i class="fa-solid fa-soap"></i></div><h5>Washing Machine</h5><small class="text-muted">Motor, drainage</small></div></div>
+        <div class="col-6 col-md-4 col-lg-2"><div class="card-modern category-card" onclick="go('report')"><div class="cat-icon"><i class="fa-solid fa-tools"></i></div><h5>Other</h5><small class="text-muted">General repairs</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" style="background:var(--grey-100);">
+    <div class="container">
+      <div class="section-title">
+        <h2>How It Works</h2>
+        <p class="text-muted">Four simple steps from problem to repair.</p>
+        <div class="section-heading-line"></div>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-3"><div class="card-modern step-card"><div class="step-num">1</div><h5>Report Problem</h5><p class="text-muted small">Describe your faulty item and upload a photo.</p></div></div>
+        <div class="col-md-3"><div class="card-modern step-card"><div class="step-num">2</div><h5>Get AI Guidance</h5><p class="text-muted small">Receive instant possible causes and repair advice.</p></div></div>
+        <div class="col-md-3"><div class="card-modern step-card"><div class="step-num">3</div><h5>Book a Technician</h5><p class="text-muted small">Choose a verified technician and book a service.</p></div></div>
+        <div class="col-md-3"><div class="card-modern step-card"><div class="step-num">4</div><h5>Track & Complete</h5><p class="text-muted small">Follow your repair status until it's done.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED TECHNICIANS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Featured Technicians</h2>
+        <p class="text-muted">Top-rated professionals ready to help.</p>
+        <div class="section-heading-line"></div>
+      </div>
+      <div class="row g-4" id="featuredTechs"></div>
+      <div class="text-center mt-4"><button class="btn btn-navy" onclick="go('find')">View All Technicians <i class="fa-solid fa-arrow-right ms-1"></i></button></div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE -->
+  <section class="section" style="background:var(--grey-100);">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-5">
+          <h2>Why Choose Smart Repair?</h2>
+          <p class="text-muted mt-3">We combine repair services with reuse to reduce waste and make repair transparent, convenient, and trustworthy.</p>
+        </div>
+        <div class="col-lg-7">
+          <div class="row g-3">
+            <div class="col-md-6"><div class="feature-item"><div class="feat-icon"><i class="fa-solid fa-shield-halved"></i></div><div><h6>Verified Technicians</h6><p class="small text-muted mb-0">All technicians are reviewed and rated by real customers.</p></div></div></div>
+            <div class="col-md-6"><div class="feature-item"><div class="feat-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div><h6>AI Guidance</h6><p class="small text-muted mb-0">Understand your problem before contacting a technician.</p></div></div></div>
+            <div class="col-md-6"><div class="feature-item"><div class="feat-icon"><i class="fa-solid fa-clock"></i></div><div><h6>Live Tracking</h6><p class="small text-muted mb-0">Follow repair status from Requested to Completed.</p></div></div></div>
+            <div class="col-md-6"><div class="feature-item"><div class="feat-icon"><i class="fa-solid fa-recycle"></i></div><div><h6>Reuse & Share</h6><p class="small text-muted mb-0">Give usable items a second life instead of discarding them.</p></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="screen-auth" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo"><i class="fa-solid fa-screwdriver-wrench"></i> Smart Repair</div>
+      <div class="auth-sub">Repair services & reuse — one platform</div>
+      <div class="auth-tabs">
+        <button class="active" onclick="switchAuthTab('login')">Login</button>
+        <button onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- LOGIN -->
+      <form id="loginForm">
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required>
+          <div class="invalid-feedback">Enter a valid email.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+          <div class="invalid-feedback">Password must be at least 6 characters.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label d-block">Login as</label>
+          <div class="role-select">
+            <div class="role-option"><input type="radio" name="loginRole" id="lrUser" value="customer" checked><label for="lrUser"><i class="fa-solid fa-user me-1"></i>Customer</label></div>
+            <div class="role-option"><input type="radio" name="loginRole" id="lrTech" value="technician"><label for="lrTech"><i class="fa-solid fa-screwdriver-wrench me-1"></i>Technician</label></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-teal w-100 py-2">Login</button>
+        <p class="text-center mt-3 small text-muted mb-0">Demo only — any email/password works.</p>
+      </form>
+
+      <!-- SIGNUP -->
+      <form id="signupForm" style="display:none;">
+        <div class="mb-3">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="signupName" placeholder="Ali Khan" required>
+          <div class="invalid-feedback">Name must be at least 2 characters.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="signupEmail" placeholder="you@example.com" required>
+          <div class="invalid-feedback">Enter a valid email.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="signupPassword" placeholder="Min 6 characters" required>
+          <div class="invalid-feedback">Password must be at least 6 characters.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label d-block">Register as</label>
+          <div class="role-select">
+            <div class="role-option"><input type="radio" name="signupRole" id="srUser" value="customer" checked><label for="srUser"><i class="fa-solid fa-user me-1"></i>Customer</label></div>
+            <div class="role-option"><input type="radio" name="signupRole" id="srTech" value="technician"><label for="srTech"><i class="fa-solid fa-screwdriver-wrench me-1"></i>Technician</label></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-teal w-100 py-2">Create Account</button>
+        <p class="text-center mt-3 small text-muted mb-0">Demo only — no real account is created.</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD SCREEN ===== -->
+<div id="screen-dashboard" class="screen">
+  <div class="container py-4">
+    <div class="dash-hero">
+      <h1>Welcome back, <span id="dashName">User</span>! 👋</h1>
+      <p>Manage your repair requests, find technicians, and explore reusable items — all in one place.</p>
+      <button class="btn btn-teal" onclick="go('report')">Report a Problem</button>
+    </div>
+    <h4 class="mb-3">Quick Actions</h4>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="card-modern quick-action" onclick="go('report')"><div class="qa-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><h6>Report Problem</h6><small class="text-muted">Describe your issue</small></div></div>
+      <div class="col-6 col-md-3"><div class="card-modern quick-action" onclick="go('find')"><div class="qa-icon"><i class="fa-solid fa-user-gear"></i></div><h6>Find Technician</h6><small class="text-muted">Browse experts</small></div></div>
+      <div class="col-6 col-md-3"><div class="card-modern quick-action" onclick="go('tracking')"><div class="qa-icon"><i class="fa-solid fa-list-check"></i></div><h6>My Requests</h6><small class="text-muted">Track repairs</small></div></div>
+      <div class="col-6 col-md-3"><div class="card-modern quick-action" onclick="go('reuse')"><div class="qa-icon"><i class="fa-solid fa-recycle"></i></div><h6>Reuse & Share</h6><small class="text-muted">Borrow or share</small></div></div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4"><div class="card-modern stat-card"><div class="stat-icon" style="background:#fef3c7;color:#92400e;"><i class="fa-solid fa-clock"></i></div><h3 id="statActive">0</h3><small class="text-muted">Active Repairs</small></div></div>
+      <div class="col-md-4"><div class="card-modern stat-card"><div class="stat-icon" style="background:#dcfce7;color:#166534;"><i class="fa-solid fa-circle-check"></i></div><h3 id="statCompleted">0</h3><small class="text-muted">Completed Repairs</small></div></div>
+      <div class="col-md-4"><div class="card-modern stat-card"><div class="stat-icon" style="background:#ede9fe;color:#6d28d9;"><i class="fa-solid fa-box-open"></i></div><h3 id="statReuse">0</h3><small class="text-muted">Reuse Listings</small></div></div>
+    </div>
+    <div class="card-modern p-4">
+      <h5 class="mb-3"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--teal);"></i>Recent Activity</h5>
+      <div class="activity-item"><div class="act-icon" style="background:#dbeafe;color:#1e40af;"><i class="fa-solid fa-screwdriver-wrench"></i></div><div><h6 class="mb-0">Repair request accepted</h6><small class="text-muted">Washing Machine • 2 hours ago</small></div></div>
+      <div class="activity-item"><div class="act-icon" style="background:#fef3c7;color:#92400e;"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div><h6 class="mb-0">AI analysis completed</h6><small class="text-muted">AC cooling issue • 1 day ago</small></div></div>
+      <div class="activity-item"><div class="act-icon" style="background:#dcfce7;color:#166534;"><i class="fa-solid fa-check"></i></div><div><h6 class="mb-0">Repair completed</h6><small class="text-muted">Laptop overheating fix • 3 days ago</small></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPORT PROBLEM SCREEN ===== -->
+<div id="screen-report" class="screen">
+  <div class="page-header">
+    <div class="container">
+      <h1><i class="fa-solid fa-triangle-exclamation me-2"></i>Report a Problem</h1>
+      <p>Describe your faulty item and get AI-assisted guidance before contacting a technician.</p>
+    </div>
+  </div>
+  <div class="container pb-5">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card-modern p-4">
+          <h5 class="mb-3">Problem Details</h5>
+          <form id="problemForm">
+            <div class="mb-3">
+              <label class="form-label">Item Category <span class="text-danger">*</span></label>
+              <select class="form-select" id="itemCategory" required>
+                <option value="">Select category…</option>
+                <option>Mobile</option><option>Laptop</option><option>Air Conditioner</option>
+                <option>Refrigerator</option><option>Washing Machine</option><option>Other</option>
+              </select>
+              <div class="invalid-feedback">Please select a category.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Problem Description <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="problemDesc" rows="4" placeholder="e.g. AC is running but not cooling…" required></textarea>
+              <div class="invalid-feedback">Please describe the problem (min 10 characters).</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Upload Image (optional)</label>
+              <input type="file" class="form-control" id="problemImage" accept="image/*">
+              <div id="imagePreview" class="mt-2"></div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button type="button" class="btn btn-navy" id="aiDetectBtn"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Get AI Analysis</button>
+              <button type="submit" class="btn btn-teal"><i class="fa-solid fa-paper-plane me-2"></i>Submit Request</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card-modern p-4">
+          <h5 class="mb-3"><i class="fa-solid fa-robot me-2" style="color:var(--teal);"></i>AI-Assisted Guidance</h5>
+          <p class="text-muted small">AI analyzes your description to give initial guidance. This is a <b>demo interface</b> — no real AI model is connected. Results are simulated for evaluation.</p>
+          <div id="aiResult" class="ai-box" style="display:none;">
+            <h5><i class="fa-solid fa-circle-info me-2"></i>Analysis Result</h5>
+            <p><b>Detected Category:</b> <span id="aiCategory"></span></p>
+            <p><b>Possible Cause:</b> <span id="aiCause"></span></p>
+            <p><b>Recommendation:</b> <span id="aiRecommendation"></span></p>
+          </div>
+          <div id="aiPlaceholder" class="text-center py-5 text-muted">
+            <i class="fa-solid fa-robot fa-3x mb-3" style="opacity:0.3;"></i>
+            <p class="mb-0">Fill the form and click <b>"Get AI Analysis"</b> to see a sample result.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FIND TECHNICIAN SCREEN ===== -->
+<div id="screen-find" class="screen">
+  <div class="page-header">
+    <div class="container">
+      <h1><i class="fa-solid fa-user-gear me-2"></i>Find a Technician</h1>
+      <p>Search and filter trusted repair professionals by service, location, and availability.</p>
+    </div>
+  </div>
+  <div class="container pb-5">
+    <div class="card-modern p-3 mb-4">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+            <input type="text" class="form-control" id="techSearch" placeholder="Search by name or specialization…">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="techCategory">
+            <option value="">All Categories</option>
+            <option value="mobile">Mobile</option><option value="laptop">Laptop</option>
+            <option value="ac">AC</option><option value="refrigerator">Refrigerator</option>
+            <option value="washing">Washing Machine</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="techLocation" placeholder="Location (e.g. Lahore)">
+        </div>
+        <div class="col-md-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="techAvailable">
+            <label class="form-check-label small" for="techAvailable">Available only</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-4" id="techList"></div>
+  </div>
+</div>
+
+<!-- ===== TRACKING SCREEN ===== -->
+<div id="screen-tracking" class="screen">
+  <div class="page-header">
+    <div class="container">
+      <h1><i class="fa-solid fa-list-check me-2"></i>My Repair Requests</h1>
+      <p>Book a service and track each request from <b>Requested → Accepted → Under Repair → Completed</b>.</p>
+    </div>
+  </div>
+  <div class="container pb-5">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="card-modern p-4">
+          <h5 class="mb-3"><i class="fa-solid fa-calendar-plus me-2" style="color:var(--teal);"></i>Book a Service</h5>
+          <form id="bookingForm">
+            <div class="mb-3">
+              <label class="form-label">Service / Item <span class="text-danger">*</span></label>
+              <select class="form-select" id="bookService" required>
+                <option value="">Select service…</option>
+                <option>Mobile Repair</option><option>Laptop Repair</option>
+                <option>Air Conditioner Repair</option><option>Refrigerator Repair</option>
+                <option>Washing Machine Repair</option><option>Other</option>
+              </select>
+              <div class="invalid-feedback">Please select a service.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Technician <span class="text-danger">*</span></label>
+              <select class="form-select" id="bookTechnician" required></select>
+              <div class="invalid-feedback">Please choose a technician.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Preferred Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" id="bookDate" required>
+              <div class="invalid-feedback">Please pick a date.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Describe the Issue <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="bookIssue" rows="3" placeholder="Briefly describe the problem…" required></textarea>
+              <div class="invalid-feedback">Please describe the issue (min 10 chars).</div>
+            </div>
+            <button type="submit" class="btn btn-teal w-100"><i class="fa-solid fa-paper-plane me-2"></i>Book Service</button>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <h5 class="mb-3"><i class="fa-solid fa-clock-rotate-left me-2" style="color:var(--teal);"></i>Your Repair Requests</h5>
+        <div id="requestsList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REUSE SCREEN ===== -->
+<div id="screen-reuse" class="screen">
+  <div class="page-header">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h1><i class="fa-solid fa-recycle me-2"></i>Reuse & Share</h1>
+        <p class="mb-0">Give useful appliances and electronics a second life — borrow, share, or list items.</p>
+      </div>
+      <button class="btn btn-teal" data-bs-toggle="modal" data-bs-target="#addItemModal"><i class="fa-solid fa-plus me-2"></i>Add Item</button>
+    </div>
+  </div>
+  <div class="container pb-5">
+    <div class="row g-4" id="reuseList"></div>
+  </div>
+</div>
+
+<!-- ===== TECHNICIAN DASHBOARD SCREEN ===== -->
+<div id="screen-techdash" class="screen">
+  <div class="page-header">
+    <div class="container">
+      <h1><i class="fa-solid fa-toolbox me-2"></i>Technician Dashboard</h1>
+      <p>Manage incoming repair requests, active jobs, and completed repairs.</p>
+    </div>
+  </div>
+  <div class="container pb-5">
+    <div class="row g-3 mb-4">
+      <div class="col-md-4"><div class="card-modern stat-card"><div class="stat-icon" style="background:#fef3c7;color:#92400e;"><i class="fa-solid fa-bell"></i></div><h3 id="techPendingCount">0</h3><small class="text-muted">New Requests</small></div></div>
+      <div class="col-md-4"><div class="card-modern stat-card"><div class="stat-icon" style="background:#dbeafe;color:#1e40af;"><i class="fa-solid fa-wrench"></i></div><h3 id="techActiveCount">0</h3><small class="text-muted">Active Repairs</small></div></div>
+      <div class="col-md-4"><div class="card-modern stat-card"><div class="stat-icon" style="background:#dcfce7;color:#166534;"><i class="fa-solid fa-circle-check"></i></div><h3 id="techCompletedCount">0</h3><small class="text-muted">Completed</small></div></div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-6"><div class="card-modern p-4"><h5 class="mb-3"><i class="fa-solid fa-bell me-2" style="color:var(--teal);"></i>New Requests</h5><div id="techPendingRequests"></div></div></div>
+      <div class="col-lg-6">
+        <div class="card-modern p-4"><h5 class="mb-3"><i class="fa-solid fa-wrench me-2" style="color:var(--teal);"></i>Active Repairs</h5><div id="techActiveRepairs"></div></div>
+        <div class="card-modern p-4 mt-4"><h5 class="mb-3"><i class="fa-solid fa-circle-check me-2" style="color:var(--teal);"></i>Completed Repairs</h5><div id="techCompletedRepairs"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FOOTER (shown on all screens) ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4"><div class="footer-brand"><i class="fa-solid fa-screwdriver-wrench"></i> Smart Repair</div><p class="small">Connecting customers with trusted repair technicians and promoting reuse of household and electronic items.</p></div>
+      <div class="col-6 col-lg-2"><h5>Platform</h5><a onclick="go('home')" style="cursor:pointer;">Home</a><a onclick="go('report')" style="cursor:pointer;">Report Problem</a><a onclick="go('find')" style="cursor:pointer;">Find Technician</a><a onclick="go('reuse')" style="cursor:pointer;">Reuse & Share</a></div>
+      <div class="col-6 col-lg-2"><h5>Account</h5><a onclick="go('auth')" style="cursor:pointer;">Login</a><a onclick="go('auth')" style="cursor:pointer;">Sign Up</a><a onclick="go('dashboard')" style="cursor:pointer;">Dashboard</a><a onclick="go('tracking')" style="cursor:pointer;">My Requests</a></div>
+      <div class="col-lg-4"><h5>Contact</h5><p class="small mb-1"><i class="fa-solid fa-envelope me-2"></i>support@smartrepair.demo</p><p class="small mb-1"><i class="fa-solid fa-phone me-2"></i>+92 300 1234567</p><p class="small mb-0"><i class="fa-solid fa-location-dot me-2"></i>Lahore, Pakistan</p></div>
+    </div>
+    <div class="footer-bottom text-center">© 2025 Smart Repair & Reuse Platform — FYP Demo. Academic use only.</div>
+  </div>
+</footer>
+
+<!-- ADD ITEM MODAL -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:var(--radius); border:none;">
+      <div class="modal-header border-0"><h5 class="modal-title">List a New Item</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form id="addItemForm">
+        <div class="modal-body">
+          <div class="mb-3"><label class="form-label">Item Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="addName" placeholder="e.g. LED TV 32 inch" required></div>
+          <div class="mb-3"><label class="form-label">Description <span class="text-danger">*</span></label><textarea class="form-control" id="addDesc" rows="2" placeholder="Condition and details…" required></textarea></div>
+          <div class="row">
+            <div class="col-6"><label class="form-label">Condition</label><select class="form-select" id="addCondition"><option>Like New</option><option>Good</option><option>Working</option><option>Needs Repair</option></select></div>
+            <div class="col-6"><label class="form-label">Type</label><select class="form-select" id="addType"><option>Borrow</option><option>Share</option></select></div>
+          </div>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-outline-teal" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-teal">Add Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ============ SEED DATA ============ */
+const SEED_TECHS = [
+  { id:1, name:"Rashid Khan", initials:"RK", spec:"AC & Refrigeration", exp:8, rating:4.9, reviews:128, location:"Gulberg, Lahore", category:"ac", available:true, rate:1500 },
+  { id:2, name:"Sana Ahmed", initials:"SA", spec:"Laptop & Mobile", exp:5, rating:4.6, reviews:94, location:"DHA, Lahore", category:"laptop", available:true, rate:1000 },
+  { id:3, name:"Muhammad Bilal", initials:"MB", spec:"Home Appliances", exp:6, rating:4.4, reviews:76, location:"Johar Town, Lahore", category:"washing", available:false, rate:1200 },
+  { id:4, name:"Faizan Zafar", initials:"FZ", spec:"Electronics Repair", exp:4, rating:4.3, reviews:52, location:"Model Town, Lahore", category:"ac", available:true, rate:900 },
+  { id:5, name:"Ayesha Malik", initials:"AM", spec:"Mobile Specialist", exp:3, rating:4.7, reviews:61, location:"Cantt, Lahore", category:"mobile", available:true, rate:800 },
+  { id:6, name:"Usman Tariq", initials:"UT", spec:"Refrigerator Expert", exp:9, rating:4.8, reviews:143, location:"Gulberg, Lahore", category:"refrigerator", available:true, rate:1600 }
+];
+const SEED_REUSE = [
+  { id:1, name:'LED TV 32"', icon:"fa-tv", condition:"Working", location:"Lahore • 2 km", type:"Borrow", desc:"Fully functional, spare TV. Available for borrowing." },
+  { id:2, name:"Microwave Oven", icon:"fa-fire-burner", condition:"Good", location:"Lahore • 4 km", type:"Share", desc:"Working microwave, no longer needed. Free to share." },
+  { id:3, name:"Office Chair", icon:"fa-chair", condition:"Like New", location:"Lahore • 1 km", type:"Borrow", desc:"Ergonomic office chair, comfortable and clean." },
+  { id:4, name:"Electric Kettle", icon:"fa-mug-hot", condition:"Working", location:"Lahore • 3 km", type:"Share", desc:"1.5L electric kettle, small crack on lid." },
+  { id:5, name:"Table Fan", icon:"fa-fan", condition:"Good", location:"Lahore • 5 km", type:"Borrow", desc:"Quiet table fan, works perfectly, spare item." },
+  { id:6, name:"Bluetooth Speaker", icon:"fa-volume-high", condition:"Working", location:"Lahore • 2 km", type:"Share", desc:"Portable speaker, good sound, minor scratches." }
+];
+
+/* ============ STORAGE HELPERS ============ */
+function getStore(key, seed) {
+  const raw = localStorage.getItem(key);
+  if (!raw) { localStorage.setItem(key, JSON.stringify(seed)); return seed; }
+  try { return JSON.parse(raw); } catch { return seed; }
+}
+function setStore(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+function getUser() { try { return JSON.parse(localStorage.getItem("sr_user")); } catch { return null; } }
+
+/* ============ TOAST ============ */
+function showToast(msg, type="success") {
+  let t = document.querySelector(".toast-custom");
+  if (!t) { t = document.createElement("div"); t.className = "toast-custom"; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.className = "toast-custom " + (type==="error"?"error":type==="info"?"info":"") + " show";
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+/* ============ NAVIGATION ============ */
+function go(screen) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const el = document.getElementById("screen-" + screen);
+  if (el) el.classList.add("active");
+  document.querySelectorAll(".navbar-custom .nav-link").forEach(l => l.classList.remove("active"));
+  const activeNav = document.querySelector(`.nav-link[data-nav="${screen}"]`);
+  if (activeNav) activeNav.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  const collapse = document.getElementById("navMenu");
+  if (collapse && collapse.classList.contains("show")) new bootstrap.Collapse(collapse).hide();
+
+  // Screen-specific render
+  if (screen === "dashboard") renderDashboard();
+  if (screen === "tracking") { renderBookingSelect(); renderRequests(); }
+  if (screen === "find") renderTechList();
+  if (screen === "reuse") renderReuse();
+  if (screen === "techdash") renderTechDash();
+  if (screen === "auth") updateNavAuth();
+}
+
+function updateNavAuth() {
+  const user = getUser();
+  const authBtns = document.getElementById("authButtons");
+  const userBadge = document.getElementById("userBadge");
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (user) {
+    authBtns.style.display = "none";
+    userBadge.style.display = "block";
+    logoutBtn.style.display = "block";
+    document.getElementById("navUserName").textContent = user.name;
+  } else {
+    authBtns.style.display = "block";
+    userBadge.style.display = "none";
+    logoutBtn.style.display = "none";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("sr_user");
+  updateNavAuth();
+  showToast("Logged out successfully", "info");
+  go("home");
+}
+
+/* ============ AUTH ============ */
+function switchAuthTab(tab) {
+  document.querySelectorAll(".auth-tabs button").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  document.getElementById("loginForm").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("signupForm").style.display = tab === "signup" ? "block" : "none";
+}
+
+document.getElementById("loginForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = document.getElementById("loginEmail");
+  const pass = document.getElementById("loginPassword");
+  let ok = true;
+  if (!email.value.includes("@")) { email.classList.add("is-invalid"); ok = false; } else email.classList.remove("is-invalid");
+  if (pass.value.length < 6) { pass.classList.add("is-invalid"); ok = false; } else pass.classList.remove("is-invalid");
+  if (!ok) { showToast("Please fix the errors", "error"); return; }
+  const role = document.querySelector('input[name="loginRole"]:checked').value;
+  localStorage.setItem("sr_user", JSON.stringify({ email: email.value, role, name: email.value.split("@")[0] }));
+  updateNavAuth();
+  showToast("Login successful!");
+  go(role === "technician" ? "techdash" : "dashboard");
+});
+
+document.getElementById("signupForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("signupName");
+  const email = document.getElementById("signupEmail");
+  const pass = document.getElementById("signupPassword");
+  let ok = true;
+  if (name.value.trim().length < 2) { name.classList.add("is-invalid"); ok = false; } else name.classList.remove("is-invalid");
+  if (!email.value.includes("@")) { email.classList.add("is-invalid"); ok = false; } else email.classList.remove("is-invalid");
+  if (pass.value.length < 6) { pass.classList.add("is-invalid"); ok = false; } else pass.classList.remove("is-invalid");
+  if (!ok) { showToast("Please fix the errors", "error"); return; }
+  const role = document.querySelector('input[name="signupRole"]:checked').value;
+  localStorage.setItem("sr_user", JSON.stringify({ email: email.value, role, name: name.value }));
+  updateNavAuth();
+  showToast("Account created!");
+  go(role === "technician" ? "techdash" : "dashboard");
+});
+
+/* ============ DASHBOARD ============ */
+function renderDashboard() {
+  const user = getUser();
+  if (!user) { go("auth"); return; }
+  document.getElementById("dashName").textContent = user.name;
+  const reqs = JSON.parse(localStorage.getItem("sr_requests") || "[]").filter(r => r.customer === user.name || !r.customer);
+  document.getElementById("statActive").textContent = reqs.filter(r => r.status !== "Completed").length;
+  document.getElementById("statCompleted").textContent = reqs.filter(r => r.status === "Completed").length;
+  const reuse = JSON.parse(localStorage.getItem("sr_reuse") || "null") || SEED_REUSE;
+  document.getElementById("statReuse").textContent = reuse.length;
+}
+
+/* ============ REPORT PROBLEM ============ */
+document.getElementById("problemImage").addEventListener("change", function() {
+  const file = this.files[0];
+  const preview = document.getElementById("imagePreview");
+  if (file && file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = (e) => { preview.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded" style="max-height:180px;">`; };
+    reader.readAsDataURL(file);
+  } else { preview.innerHTML = ""; }
+});
+
+document.getElementById("aiDetectBtn").addEventListener("click", function() {
+  const cat = document.getElementById("itemCategory").value;
+  const desc = document.getElementById("problemDesc").value.trim();
+  if (!cat) { showToast("Please select an item category", "error"); return; }
+  if (desc.length < 10) { showToast("Please describe the problem (min 10 chars)", "error"); return; }
+  this.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Analyzing…';
+  this.disabled = true;
+  const btn = this;
+  setTimeout(() => {
+    const result = generateAI(cat, desc);
+    document.getElementById("aiCategory").textContent = result.category;
+    document.getElementById("aiCause").textContent = result.cause;
+    document.getElementById("aiRecommendation").textContent = result.recommendation;
+    document.getElementById("aiResult").style.display = "block";
+    document.getElementById("aiPlaceholder").style.display = "none";
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles me-2"></i>Get AI Analysis';
+    btn.disabled = false;
+    showToast("AI analysis complete (demo)");
+  }, 1200);
+});
+
+function generateAI(cat, desc) {
+  const map = {
+    "Mobile": { category:"Battery / Charging System", cause:"Battery degradation, faulty charging port, or software issue.", recommendation:"Repair recommended if device is <3 years old. Battery replacement is usually economical." },
+    "Laptop": { category:"Cooling / Thermal Issue", cause:"Dust-clogged fan, dried thermal paste, or blocked vents causing overheating.", recommendation:"Repair recommended. Fan cleaning + thermal paste = affordable fix." },
+    "Air Conditioner": { category:"Cooling System / Compressor", cause:"Low refrigerant gas, dirty condenser coils, or compressor overheat.", recommendation:"Repair recommended. Gas refill + coil cleaning usually costs much less than replacement." },
+    "Refrigerator": { category:"Cooling / Thermostat", cause:"Gas leakage, faulty thermostat, or blocked airflow inside the unit.", recommendation:"Professional inspection needed. Repair usually viable." },
+    "Washing Machine": { category:"Motor / Drainage System", cause:"Worn belt, blocked drain filter, or motor coupling issue.", recommendation:"Repair recommended. Most such repairs are inexpensive." },
+    "Other": { category:"General Fault (Demo)", cause:"Please describe symptoms more clearly for better detection.", recommendation:"Contact a technician for accurate diagnosis." }
+  };
+  return map[cat] || map.Other;
+}
+
+document.getElementById("problemForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const user = getUser();
+  if (!user) { showToast("Please login first", "error"); setTimeout(() => go("auth"), 800); return; }
+  const cat = document.getElementById("itemCategory").value;
+  const desc = document.getElementById("problemDesc").value.trim();
+  if (!cat || desc.length < 10) { showToast("Please complete the form", "error"); return; }
+  const requests = getStore("sr_requests", []);
+  requests.push({ id: Date.now(), item: cat, description: desc, status: "Requested", technician: "Unassigned", date: new Date().toLocaleDateString(), customer: user.name });
+  setStore("sr_requests", requests);
+  showToast("Repair request submitted!");
+  document.getElementById("problemForm").reset();
+  document.getElementById("imagePreview").innerHTML = "";
+  document.getElementById("aiResult").style.display = "none";
+  document.getElementById("aiPlaceholder").style.display = "block";
+  setTimeout(() => go("tracking"), 900);
+});
+
+/* ============ FIND TECHNICIAN ============ */
+function renderTechList() {
+  const techs = getStore("sr_technicians", SEED_TECHS);
+  const container = document.getElementById("techList");
+  const q = (document.getElementById("techSearch").value || "").toLowerCase();
+  const cat = document.getElementById("techCategory").value || "";
+  const loc = (document.getElementById("techLocation").value || "").toLowerCase();
+  const onlyAvail = document.getElementById("techAvailable").checked;
+
+  const filtered = techs.filter(t => {
+    if (q && !(t.name + t.spec).toLowerCase().includes(q)) return false;
+    if (cat && t.category !== cat) return false;
+    if (loc && !t.location.toLowerCase().includes(loc)) return false;
+    if (onlyAvail && !t.available) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="col-12 text-center py-5"><i class="fa-solid fa-user-slash fa-2x text-muted mb-3"></i><p class="text-muted">No technicians match your filters.</p></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(t => `
+    <div class="col-md-6"><div class="card-modern tech-card">
+      <div class="d-flex gap-3 align-items-start">
+        <div class="tech-avatar">${t.initials}</div>
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start">
+            <h6 class="mb-1">${t.name}</h6>
+            <span class="status-badge ${t.available?'status-completed':'status-rejected'}">${t.available?'Available':'Busy'}</span>
+          </div>
+          <div class="stars mb-1">${'★'.repeat(Math.round(t.rating))}${'☆'.repeat(5-Math.round(t.rating))} <small class="text-muted">(${t.rating} • ${t.reviews} reviews)</small></div>
+          <div class="d-flex gap-1 flex-wrap mb-2"><span class="tag">${t.spec}</span><span class="tag">${t.exp} yrs exp</span></div>
+          <p class="mb-2 small text-muted"><i class="fa-solid fa-location-dot me-1"></i>${t.location} • From Rs. ${t.rate}</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-teal btn-sm-custom" onclick="viewTech(${t.id})">View Profile</button>
+            <button class="btn btn-teal btn-sm-custom" onclick="bookTech(${t.id})">Book Service</button>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  `).join("");
+}
+["techSearch","techCategory","techLocation","techAvailable"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("input", renderTechList);
+});
+function viewTech(id) {
+  const techs = getStore("sr_technicians", SEED_TECHS);
+  const t = techs.find(x => x.id === id);
+  if (!t) return;
+  alert(`👤 ${t.name}\n\nSpecialization: ${t.spec}\nExperience: ${t.exp} years\nRating: ${t.rating} ⭐ (${t.reviews} reviews)\nLocation: ${t.location}\nStarting rate: Rs. ${t.rate}\n\n${t.available?"Available for booking":"Currently busy"}`);
+}
+function bookTech(id) {
+  localStorage.setItem("sr_bookTech", id);
+  go("tracking");
+}
+
+/* ============ BOOKING + TRACKING ============ */
+function renderBookingSelect() {
+  const techs = getStore("sr_technicians", SEED_TECHS);
+  const sel = document.getElementById("bookTechnician");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select a technician…</option>' + techs.map(t => `<option value="${t.id}">${t.name} — ${t.spec}</option>`).join("");
+  const pre = localStorage.getItem("sr_bookTech");
+  if (pre) { sel.value = pre; localStorage.removeItem("sr_bookTech"); }
+  const dateInput = document.getElementById("bookDate");
+  if (dateInput) dateInput.min = new Date().toISOString().split("T")[0];
+}
+
+document.getElementById("bookingForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const user = getUser();
+  if (!user) { showToast("Please login first", "error"); setTimeout(() => go("auth"), 800); return; }
+  const service = document.getElementById("bookService").value;
+  const techId = document.getElementById("bookTechnician").value;
+  const date = document.getElementById("bookDate").value;
+  const issue = document.getElementById("bookIssue").value.trim();
+  let ok = true;
+  if (!service) { document.getElementById("bookService").classList.add("is-invalid"); ok = false; } else document.getElementById("bookService").classList.remove("is-invalid");
+  if (!techId) { document.getElementById("bookTechnician").classList.add("is-invalid"); ok = false; } else document.getElementById("bookTechnician").classList.remove("is-invalid");
+  if (!date) { document.getElementById("bookDate").classList.add("is-invalid"); ok = false; } else document.getElementById("bookDate").classList.remove("is-invalid");
+  if (issue.length < 10) { document.getElementById("bookIssue").classList.add("is-invalid"); ok = false; } else document.getElementById("bookIssue").classList.remove("is-invalid");
+  if (!ok) { showToast("Please fill all fields correctly", "error"); return; }
+  const techs = getStore("sr_technicians", SEED_TECHS);
+  const tech = techs.find(t => String(t.id) === String(techId));
+  const requests = getStore("sr_requests", []);
+  requests.push({ id: Date.now(), item: service, description: issue, status: "Requested", technician: tech ? tech.name : "Unassigned", date, customer: user.name });
+  setStore("sr_requests", requests);
+  showToast("Booking created successfully!");
+  document.getElementById("bookingForm").reset();
+  renderRequests();
+});
+
+function renderRequests() {
+  const container = document.getElementById("requestsList");
+  if (!container) return;
+  const user = getUser();
+  let requests = getStore("sr_requests", []);
+  if (user) requests = requests.filter(r => r.customer === user.name || !r.customer);
+  if (!requests.length) {
+    container.innerHTML = `<div class="card-modern p-5 text-center"><i class="fa-solid fa-inbox fa-2x text-muted mb-3"></i><h5>No repair requests yet</h5><p class="text-muted">Submit a repair request to see it here.</p><button class="btn btn-teal" onclick="go('report')">Report a Problem</button></div>`;
+    return;
+  }
+  const stages = ["Requested","Accepted","Under Repair","Completed"];
+  container.innerHTML = requests.slice().reverse().map(r => {
+    const stageIndex = stages.indexOf(r.status);
+    const steps = stages.map((s,i) => {
+      let cls = "todo";
+      if (i < stageIndex) cls = "done"; else if (i === stageIndex) cls = "current";
+      return `<div class="tl-step ${cls}"><span class="dot">${i < stageIndex ? "✓" : i+1}</span><span>${s}</span></div>${i < stages.length-1 ? `<div class="tl-line ${i < stageIndex ? 'done' : ''}"></div>` : ""}`;
+    }).join("");
+    const statusCls = { "Requested":"status-requested","Accepted":"status-accepted","Under Repair":"status-repair","Completed":"status-completed","Rejected":"status-rejected" }[r.status];
+    return `<div class="card-modern p-4 mb-3">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div><h6 class="mb-1"><i class="fa-solid fa-screwdriver-wrench me-2" style="color:var(--teal);"></i>${r.item}</h6><small class="text-muted">Technician: <b>${r.technician}</b> • Date: ${r.date}</small></div>
+        <span class="status-badge ${statusCls}">${r.status}</span>
+      </div>
+      <p class="mt-2 small text-muted mb-1">${r.description}</p>
+      <div class="timeline">${steps}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ============ REUSE ============ */
+function renderReuse() {
+  const container = document.getElementById("reuseList");
+  if (!container) return;
+  const items = getStore("sr_reuse", SEED_REUSE);
+  container.innerHTML = items.map(it => `
+    <div class="col-md-6 col-lg-4"><div class="card-modern reuse-card">
+      <div class="reuse-img"><i class="fa-solid ${it.icon}"></i></div>
+      <div class="reuse-body">
+        <h6>${it.name}</h6>
+        <div class="small text-muted mb-2"><i class="fa-solid fa-location-dot me-1"></i>${it.location} • <span class="badge bg-success-subtle text-success-emphasis">${it.type}</span></div>
+        <p class="small text-muted mb-2">${it.desc}</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-teal btn-sm-custom" onclick="reuseAction('${it.type}', '${it.name}')">${it.type === "Borrow" ? "Borrow" : "Share"}</button>
+          <button class="btn btn-outline-teal btn-sm-custom" onclick="reuseDetails('${it.name}','${it.desc}','${it.location}','${it.condition}')">Details</button>
+        </div>
+      </div>
+    </div></div>
+  `).join("");
+}
+function reuseAction(type, name) { showToast(`${type === "Borrow" ? "Borrow" : "Share"} request for "${name}" sent!`); }
+function reuseDetails(name, desc, location, condition) { alert(`📦 ${name}\n\nCondition: ${condition}\nLocation: ${location}\n\n${desc}`); }
+
+document.getElementById("addItemForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("addName").value.trim();
+  const desc = document.getElementById("addDesc").value.trim();
+  const cond = document.getElementById("addCondition").value;
+  const type = document.getElementById("addType").value;
+  if (name.length < 3 || desc.length < 5) { showToast("Please fill all fields", "error"); return; }
+  const fresh = getStore("sr_reuse", SEED_REUSE);
+  fresh.push({ id: Date.now(), name, icon:"fa-box", condition: cond, location:"Lahore • 1 km", type, desc });
+  setStore("sr_reuse", fresh);
+  showToast("Item added to Reuse & Share!");
+  document.getElementById("addItemForm").reset();
+  bootstrap.Modal.getInstance(document.getElementById("addItemModal")).hide();
+  renderReuse();
+});
+
+/* ============ TECHNICIAN DASHBOARD ============ */
+function renderTechDash() {
+  // Seed some demo requests if empty
+  let reqs = getStore("sr_requests", []);
+  if (reqs.length === 0) {
+    reqs = [
+      { id:1001, item:"Air Conditioner", description:"Not cooling, compressor shutting down.", status:"Requested", technician:"Unassigned", date:"18 Nov 2025", customer:"ali" },
+      { id:1002, item:"Laptop", description:"Overheating and random shutdowns.", status:"Requested", technician:"Unassigned", date:"17 Nov 2025", customer:"sara" }
+    ];
+    setStore("sr_requests", reqs);
+  }
+  const pending = reqs.filter(r => r.status === "Requested");
+  const active = reqs.filter(r => r.status === "Accepted" || r.status === "Under Repair");
+  const completed = reqs.filter(r => r.status === "Completed");
+
+  document.getElementById("techPendingCount").textContent = pending.length;
+  document.getElementById("techActiveCount").textContent = active.length;
+  document.getElementById("techCompletedCount").textContent = completed.length;
+
+  document.getElementById("techPendingRequests").innerHTML = pending.length ? pending.map(r => `
+    <div class="card-modern p-3 mb-2 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div><h6 class="mb-1">${r.item}</h6><small class="text-muted">${r.description}</small><br><small class="text-muted">Customer: ${r.customer || "—"} • ${r.date}</small></div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-teal btn-sm-custom" onclick="updateReq(${r.id},'Accepted')">Accept</button>
+        <button class="btn btn-outline-teal btn-sm-custom" onclick="updateReq(${r.id},'Rejected')">Reject</button>
+      </div>
+    </div>`).join("") : `<p class="text-muted small mb-0">No new requests.</p>`;
+
+  document.getElementById("techActiveRepairs").innerHTML = active.length ? active.map(r => `
+    <div class="card-modern p-3 mb-2 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div><h6 class="mb-1">${r.item}</h6><small class="text-muted">${r.description}</small></div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <span class="status-badge ${r.status === "Accepted" ? "status-accepted" : "status-repair"}">${r.status}</span>
+        ${r.status === "Accepted" ? `<button class="btn btn-teal btn-sm-custom" onclick="updateReq(${r.id},'Under Repair')">Start Repair</button>` : ""}
+        ${r.status === "Under Repair" ? `<button class="btn btn-teal btn-sm-custom" onclick="updateReq(${r.id},'Completed')">Mark Complete</button>` : ""}
+      </div>
+    </div>`).join("") : `<p class="text-muted small mb-0">No active repairs.</p>`;
+
+  document.getElementById("techCompletedRepairs").innerHTML = completed.length ? completed.map(r => `
+    <div class="card-modern p-3 mb-2">
+      <div class="d-flex justify-content-between"><h6 class="mb-1">${r.item}</h6><span class="status-badge status-completed">Completed</span></div>
+      <small class="text-muted">${r.description}</small>
+    </div>`).join("") : `<p class="text-muted small mb-0">No completed repairs.</p>`;
+}
+
+function updateReq(id, status) {
+  const reqs = getStore("sr_requests", []);
+  const idx = reqs.findIndex(r => r.id === id);
+  if (idx >= 0) {
+    reqs[idx].status = status;
+    setStore("sr_requests", reqs);
+    showToast(`Request ${status.toLowerCase()}`);
+    renderTechDash();
+  }
+}
+
+/* ============ INIT ============ */
+document.addEventListener("DOMContentLoaded", () => {
+  updateNavAuth();
+  // Featured techs on home
+  const featured = getStore("sr_technicians", SEED_TECHS);
+  document.getElementById("featuredTechs").innerHTML = featured.slice(0,3).map(t => `
+    <div class="col-md-4"><div class="card-modern tech-card">
+      <div class="d-flex gap-3 align-items-start">
+        <div class="tech-avatar">${t.initials}</div>
+        <div><h6 class="mb-1">${t.name}</h6><div class="stars mb-1">${'★'.repeat(Math.round(t.rating))} <small class="text-muted">(${t.rating})</small></div><div class="d-flex gap-1 flex-wrap"><span class="tag">${t.spec}</span><span class="tag">${t.exp} yrs</span></div><p class="mb-0 mt-2 small text-muted"><i class="fa-solid fa-location-dot me-1"></i>${t.location}</p></div>
+      </div>
+      <button class="btn btn-outline-teal btn-sm-custom w-100 mt-3" onclick="go('find')">View Profile</button>
+    </div></div>
+  `).join("");
+  // Pre-render find list so filters work first time
+  renderTechList();
+});
+</script>
+</body>
+</html>
